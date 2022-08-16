@@ -11,12 +11,11 @@ export default class PipelineConstruct extends Construct {
 
     const account = props?.env?.account!;
     const region = props?.env?.region!;
-    const env = { account, region };
 
     const blueprint = blueprints.EksBlueprint.builder()
     .account(account)
     .region(region)
-    .addOns()
+    .addOns(new blueprints.ClusterAutoScalerAddOn) // Cluster Autoscaler addon goes here
     .teams(new TeamPlatform(account), new TeamApplication('burnham',account));
   
     blueprints.CodePipelineStack.builder()
@@ -35,6 +34,6 @@ export default class PipelineConstruct extends Construct {
           { id: "prod", stackBuilder: blueprint.clone('us-east-1')}
         ]
       })
-      .build(scope, id+'-stack', { env });
+      .build(scope, id+'-stack', props);
   }
 }
